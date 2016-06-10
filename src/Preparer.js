@@ -44,7 +44,7 @@ function prepareEpubDataForIndexing(metaData, data) {
     }
 
     data.FirstSpineItemsId.push(
-        metaData.spineItems[0].id + ':' + metaData.title
+        metaData.spineItems[0].id + ':' + metaData.title + ':' + metaData.filename
     );
 
     metaData.spineItems.forEach(function(spineItem) {
@@ -62,7 +62,7 @@ function setMetaData(jsonDoc, meta, spineItemMeta) {
     jsonDoc.spineItemPath = meta.manifestPath + '/' + spineItemMeta.href;
     jsonDoc.href = spineItemMeta.href;
     jsonDoc.baseCfi = spineItemMeta.baseCfi;
-    jsonDoc.id = spineItemMeta.id + ':' + meta.title;
+    jsonDoc.id = spineItemMeta.id + ':' + meta.title + ':' + meta.filename;
 }
 
 function htmlToJSON(file) {

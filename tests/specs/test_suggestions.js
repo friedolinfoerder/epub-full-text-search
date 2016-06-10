@@ -99,4 +99,18 @@ describe('suggestions', function () {
             })
             .fail(done);
     });
+
+    it('should return all suggestions for string matrix with filename filter', function (done) {
+
+        se.match('matrix', {field: 'filename', value: 'linear-algebra'})
+            .then(function (matches) {
+                console.log(matches);
+                matches.length.should.be.exactly(2);
+                matches[0].should.be.exactly('matrix');
+                matches[1].should.be.exactly('matrixform');
+
+                done();
+            })
+            .fail(done);
+    });
 });

@@ -112,16 +112,26 @@ module.exports = function (options) {
             });
     };
 
-    SearchEngine.match = function (beginsWith, epubTitle) {
+    SearchEngine.match = function (beginsWithOrObject, filterObject) {
 
-        if (!_.isString(epubTitle) && !_.isNull(epubTitle))
-            console.error('epubTitle should be null or type string');
+        if(!filterObject) {
+            filterObject = {field: 'title', value: '*'};
+        }
+        if(_.isString(filterObject)) {
+            filterObject = {field: 'title', value: filterObject};
+        }
 
         var epubTitle = epubTitle || DEFAULT_EPUB_TITLE;
 
-        return SearchEngine._match({beginsWith: beginsWith, type: 'ID'})
+        if(!_.isObject(beginsWithOrObject)) {
+            beginsWithOrObject = {beginsWith: beginsWithOrObject, type: 'ID'};
+        } else {
+            beginsWithOrObject.type = 'ID';
+        }
+
+        return SearchEngine._match(beginsWithOrObject)
             .then(function(matches) {
-                return filterMatches(matches, epubTitle);
+                return filterMatches(matches, filterObject);
             });
     };
 
@@ -149,20 +159,19 @@ module.exports = function (options) {
         };
     }
 
-    function filterMatches(matches, epubTitle) {
+    function filterMatches(matches, filter) {
 
         return matches
             .map(function (match) {
-
-                if (epubTitle === '*') {
+                if (filter.value === '*') {
                     // if epubTitle undefined return all matches
                     return match[0];
                 } else {
-                    var titles = match[1].map(function (id) {
-                        // id = spineitemid:epubtitle
-                        return id.split(':')[1]
+                    var values = match[1].map(function (id) {
+                        // id = spineitemid:epubtitle:filename
+                        return id.split(':')[filter.field === 'filename' ? 2 : 1]
                     });
-                    return _.include(titles, epubTitle) ? match[0] : '';
+                    return _.include(values, filter.value) ? match[0] : '';
                 }
             })
             .filter(Boolean); // filter ["", "", ""] -> []
