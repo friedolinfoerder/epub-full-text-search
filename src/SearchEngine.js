@@ -37,14 +37,17 @@ module.exports = function (options) {
                 console.log("\n******************************************************\n");
                 console.log("Ready Normalize epub content\n\n".yellow);
 
-                if (dataSet.length > 0)
-                    console.log("Start writing epub-data to index.");
-                else {
-                    console.log("DONE! Nothing to do, epubs already indexed.\n\n");
+                if (dataSet.length > 0) {
+                    console.log('[epub-full-text-search] ' + "Start writing epub-data to index.".yellow);
+                } else {
+                    console.log('[epub-full-text-search] ' + "Nothing to do, epubs already indexed.".yellow);
                     return;
                 }
 
                 return SearchEngine.add(dataSet);
+            })
+            .then(function() {
+                console.log('[epub-full-text-search] ' + 'Done with indexing'.green);
             });
     };
 
