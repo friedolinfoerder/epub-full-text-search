@@ -51,14 +51,12 @@ describe('search', function () {
     it('filter by filename', function(done) {
         var search = 'test';
         se.query({
-            query: [
-                {
-                    AND: [
-                        {'*': [search]},
-                        {filename: ['accessible_epub_3']}
-                    ]
-                }
-            ]
+            query: [{
+                AND: [
+                    {'*': [search]},
+                    {filename: ['accessible_epub_3']}
+                ]
+            }]
         }, search)
             .then(function(hits) {
                 hits.length.should.be.exactly(3);

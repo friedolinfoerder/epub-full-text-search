@@ -18,7 +18,10 @@ module.exports = function (options) {
     var SearchEngine = {};
 
     const INDEX_DB = 'full-text-search-DB'; // path to index-db 
-    var defaultOption = {'indexPath': INDEX_DB};
+    var defaultOption = {
+        indexPath: INDEX_DB,
+        zipped: true
+    };
     var options = _.isEmpty(options) ? defaultOption : options;
 
     SearchEngine.indexing = function (pathToEpubs) {
@@ -78,36 +81,39 @@ module.exports = function (options) {
     };
 
     SearchEngine.query = function(query, search) {
+        var hits = [];
         return SearchEngine._search(query)
             .then(function (result) {
-                var hits = [];
-
                 if (!result.hits) {
                     return hits;
                 }
 
-                result.hits.forEach(function(hit) {
+                return Q.all(result.hits.map(function(hit) {
                     var document = hit.document,
                         idData = document.id.split(':'),
-                        title = idData[1];
+                        title = idData[1],
+                        base = document.spineItemPath.slice(0, - document.href.length - 1);
 
                     document.id = idData[0];
 
-                    var cfiList = cfi.generate({
-                        "query": [search],
-                        "spineItemPath": document.spineItemPath,
-                        "baseCfi": document.baseCfi
-                    });
-
-                    if (cfiList.length > 0) {
-                        document.cfis = cfiList;
-                        delete document['*'];
-                        delete document.spineItemPath;
-
-                        hits.push(document);
-                    }
-
-                });
+                    return cfi.generate({
+                        query: [search],
+                        spineItemPath: document.spineItemPath,
+                        baseCfi: document.baseCfi,
+                        href: document.href,
+                        base: base
+                    }, options.zipped)
+                        .then(function(cfiList) {
+                            if (cfiList.length > 0) {
+                                document.cfis = cfiList;
+                                delete document['*'];
+                                delete document.spineItemPath;
+                                hits.push(document);
+                            }
+                        });
+                }));
+            })
+            .then(function() {
                 return hits;
             });
     };

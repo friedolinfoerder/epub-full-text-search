@@ -2,26 +2,38 @@ var fs = require('fs');
 var cheerio = require('cheerio');
 var async = require('async');
 var mathML = require('./MathML.js');
-//var cfiLib = require('epub-cfi');
-//var jsdom = require('jsdom').jsdom;
+var Q = require('q');
+var readFile = Q.denodeify(fs.readFile);
+var AdmZip = require('adm-zip');
 
 
-exports.generate = function (data) {
+exports.generate = function (data, zipped) {
 
-    var html = fs.readFileSync(data.spineItemPath);
-    var $ = cheerio.load(html);
-    //var cfis = [];
-    var needMathMlOffset = false;
+    var htmlPromise;
+    if(zipped) {
+        var htmlDeferred = Q.defer();
+        var zip = new AdmZip(data.base + '.epub');
+        htmlDeferred.resolve(zip.readAsText(data.href));
+        htmlPromise = htmlDeferred.promise;
+    } else {
+        console.log('use file to generate cfi');
+        htmlPromise = readFile(data.spineItemPath);
+    }
 
+    return htmlPromise
+        .then(function(html) {
+            var $ = cheerio.load(html);
+            //var cfis = [];
+            var needMathMlOffset = false;
 
-//var document = jsdom(html,{features:{FetchExternalResources: false}});
-    mathML.process($, function (needOffset) {
-        needMathMlOffset = needOffset
-    });
+            mathML.process($, function (needOffset) {
+                needMathMlOffset = needOffset
+            });
 
-    var elements = getElementsThatContainsQuery(data.query, $);
+            var elements = getElementsThatContainsQuery(data.query, $);
 
-    return generateCFIs(data.baseCfi, elements, needMathMlOffset);
+            return generateCFIs(data.baseCfi, elements, needMathMlOffset);
+        });
 };
 
 
