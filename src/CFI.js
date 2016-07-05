@@ -16,7 +16,6 @@ exports.generate = function (data, zipped) {
         htmlDeferred.resolve(zip.readAsText(data.href));
         htmlPromise = htmlDeferred.promise;
     } else {
-        console.log('use file to generate cfi');
         htmlPromise = readFile(data.spineItemPath);
     }
 
