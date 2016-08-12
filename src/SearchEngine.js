@@ -141,6 +141,14 @@ module.exports = function (options) {
             });
     };
 
+    SearchEngine.del = function (batch) {
+        return SearchEngine._del(batch);
+    };
+
+    SearchEngine.flush = function () {
+        return SearchEngine._flush();
+    };
+
     SearchEngine.empty = function () {
         return SearchEngine._empty();
     };
@@ -191,6 +199,8 @@ module.exports = function (options) {
             SearchEngine._empty = Q.nbind(si.empty, si);
             SearchEngine._match = Q.nbind(si.match, si);
             SearchEngine._add = Q.nbind(si.add, si);
+            SearchEngine._del = Q.nbind(si.del, si);
+            SearchEngine._flush = Q.nbind(si.flush, si);
             return SearchEngine;
         });
 };

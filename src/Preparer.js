@@ -8,13 +8,17 @@ exports.normalize = function (pathToEpubs) {
 
     console.log('epub data folder: '.red + pathToEpubs.green + '\n\n');
 
+    var metaDataList;
+
     return parser.getMetaDatas(pathToEpubs)
-        .then(function (metaDataList) {
+        .then(function (_metaDataList) {
+            metaDataList = _metaDataList;
 
             console.log('Analyse folder:'.yellow + '\n');
 
-            metaDataList = indexingController.doWork(metaDataList);
-
+            return indexingController.doWork(metaDataList);
+        })
+        .then(function() {
             var dataSet = [];
 
             metaDataList.forEach(function(metaData) {
