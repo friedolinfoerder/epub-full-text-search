@@ -81,7 +81,6 @@ function htmlToJSON(file) {
         $("body").each(function (i, e) {
             var body = $(e);
             doc.body = trim(body.text());
-
         });
 
     } catch (err) {
@@ -92,5 +91,5 @@ function htmlToJSON(file) {
 }
 
 function trim(str) {
-    return str.replace(/\W/g, ' ').replace(/\s+/g, ' ');
+    return str.replace(/\s+/g, ' ');
 }
