@@ -91,5 +91,9 @@ function htmlToJSON(file) {
 }
 
 function trim(str) {
-    return str.replace(/\s+/g, ' ');
+    str = str.replace(/\s+/g, ' ');
+    str = str.split(' ').filter(function(word) {
+        return word.length > 3;
+    }).join(' ');
+    return str;
 }
